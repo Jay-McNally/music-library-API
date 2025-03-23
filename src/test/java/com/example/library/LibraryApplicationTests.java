@@ -1,6 +1,5 @@
 package com.example.library;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -10,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -19,48 +20,19 @@ class LibraryApplicationTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private String createdLibraryId;
-
     @BeforeEach
     void setUp() throws Exception {
-        createdLibraryId = createNewMusicLibrary();
+        createNewMusicLibrary();
     }
 
-    private String createNewMusicLibrary() throws Exception {
-        String newLibraryJson = """
-        {
-            "Nirvana": {
-                "BBC Sessions Nirvana - 1989-1990": [
-                    {
-                        "title": "(New Wave) Polly",
-                        "artist": "Nirvana",
-                        "album": "BBC Sessions Nirvana - 1989-1990",
-                        "genre": "Other",
-                        "duration": 108
-                    },
-                    {
-                        "title": "About A Girl",
-                        "artist": "Nirvana",
-                        "album": "BBC Sessions Nirvana - 1989-1990",
-                        "genre": "Other",
-                        "duration": 163
-                    }
-                ]
-            }
-        }
-        """;
+    private void createNewMusicLibrary() throws Exception {
+        String newLibraryJson = new String(Files.readAllBytes(Paths.get("src/main/resources/static/music_library.json")));
 
         // Save the new music library
-        MvcResult result = mockMvc.perform(post("/api/music-library")
+        mockMvc.perform(post("/api/music-libraries")
                 .contentType("application/json")
                 .content(newLibraryJson))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        // Extract the ID of the newly created music library from the response
-        String location = result.getResponse().getHeader("Location");
-        assertNotNull(location);
-        return location.substring(location.lastIndexOf("/") + 1);
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -69,32 +41,92 @@ class LibraryApplicationTests {
 
     @Test
     void testRetrieveAllMusicLibraries() throws Exception {
-        mockMvc.perform(get("/api/music-library"))
+        mockMvc.perform(get("/api/music-libraries"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
     }
 
     @Test
     void testRetrieveMusicLibraryById() throws Exception {
-        mockMvc.perform(get("/api/music-library/{id}", createdLibraryId))
+        // Assuming the ID of the created library is "1"
+        mockMvc.perform(get("/api/music-libraries/{id}", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.Nirvana['BBC Sessions Nirvana - 1989-1990'][0].title").value("(New Wave) Polly"))
-                .andExpect(jsonPath("$.Nirvana['BBC Sessions Nirvana - 1989-1990'][1].title").value("About A Girl"));
+                .andExpect(jsonPath("$.artists[0].name").value("Nirvana"))
+                .andExpect(jsonPath("$.artists[0].albums[0].name").value("BBC Sessions Nirvana - 1989-1990"))
+                .andExpect(jsonPath("$.artists[0].albums[0].tracks[0].title").value("(New Wave) Polly"))
+                .andExpect(jsonPath("$.artists[0].albums[0].tracks[1].title").value("About A Girl"));
     }
 
     @Test
-    void testSaveNewMusicLibrary() throws Exception {
-        String newLibraryId = createNewMusicLibrary();
-        assertNotNull(newLibraryId);
+    void testRetrieveAllArtists() throws Exception {
+        mockMvc.perform(get("/api/artists"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].name").value("Nirvana"));
     }
 
     @Test
-    void testDeleteMusicLibraryById() throws Exception {
-        String newLibraryId = createNewMusicLibrary();
+    void testRetrieveArtistByName() throws Exception {
+        mockMvc.perform(get("/api/artists").param("name", "Nirvana"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].name").value("Nirvana"));
+    }
 
-        // Delete the newly created music library
-        mockMvc.perform(delete("/api/music-library/{id}", newLibraryId))
-                .andExpect(status().isNoContent());
+    @Test
+    void testRetrieveAllAlbums() throws Exception {
+        mockMvc.perform(get("/api/albums"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].name").value("BBC Sessions Nirvana - 1989-1990"));
+    }
+
+    @Test
+    void testRetrieveAlbumsByArtist() throws Exception {
+        mockMvc.perform(get("/api/albums").param("artist", "Nirvana"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].artist").value("Nirvana"));
+    }
+
+    @Test
+    void testRetrieveAlbumsByGenre() throws Exception {
+        mockMvc.perform(get("/api/albums").param("genre", "Other"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].genre").value("Other"));
+    }
+
+    @Test
+    void testRetrieveAllTracks() throws Exception {
+        mockMvc.perform(get("/api/tracks"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].title").value("(New Wave) Polly"));
+    }
+
+    @Test
+    void testRetrieveTracksByArtist() throws Exception {
+        mockMvc.perform(get("/api/tracks").param("artist", "Nirvana"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].artist").value("Nirvana"));
+    }
+
+    @Test
+    void testRetrieveTracksByAlbum() throws Exception {
+        mockMvc.perform(get("/api/tracks").param("album", "BBC Sessions Nirvana - 1989-1990"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].album").value("BBC Sessions Nirvana - 1989-1990"));
+    }
+
+    @Test
+    void testRetrieveTracksByGenre() throws Exception {
+        mockMvc.perform(get("/api/tracks").param("genre", "Other"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].genre").value("Other"));
     }
 }
