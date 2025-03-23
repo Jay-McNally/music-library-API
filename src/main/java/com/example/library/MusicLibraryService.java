@@ -16,12 +16,4 @@ public class MusicLibraryService {
     public MusicLibrary getMusicLibraryById(String id) {
         return musicLibraryRepository.findById(id).orElse(null);
     }
-
-    public MusicLibrary saveMusicLibrary(MusicLibrary musicLibrary) {
-        return musicLibraryRepository.save(musicLibrary);
-    }
-
-    public void deleteMusicLibrary(String id) {
-        musicLibraryRepository.deleteById(id);
-    }
 }

@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/music-library")
@@ -36,10 +35,4 @@ public class MusicLibraryController {
         return new ResponseEntity<>(savedMusicLibrary, HttpStatus.CREATED);
     }
 
-    // Delete a music library by its ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMusicLibrary(@PathVariable String id) {
-        musicLibraryService.deleteMusicLibrary(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 }
