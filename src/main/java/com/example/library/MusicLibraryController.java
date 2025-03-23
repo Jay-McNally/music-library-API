@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/music-library")
+@RequestMapping("/api/music-libraries")
 public class MusicLibraryController {
 
     @Autowired
@@ -23,16 +23,12 @@ public class MusicLibraryController {
     // Retrieve a music library by its ID
     @GetMapping("/{id}")
     public ResponseEntity<MusicLibrary> getMusicLibraryById(@PathVariable String id) {
-        Optional<MusicLibrary> musicLibrary = Optional.ofNullable(musicLibraryService.getMusicLibraryById(id));
-        return musicLibrary.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
-    // Save a new or updated music library
-    @PostMapping
-    public ResponseEntity<MusicLibrary> saveMusicLibrary(@RequestBody MusicLibrary musicLibrary) {
-        MusicLibrary savedMusicLibrary = musicLibraryService.saveMusicLibrary(musicLibrary);
-        return new ResponseEntity<>(savedMusicLibrary, HttpStatus.CREATED);
+        MusicLibrary musicLibrary = musicLibraryService.getMusicLibraryById(id);
+        if (musicLibrary != null) {
+            return new ResponseEntity<>(musicLibrary, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }

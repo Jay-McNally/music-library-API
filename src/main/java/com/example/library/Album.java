@@ -5,24 +5,23 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.List;
+
 @Data
-@Document(collection = "tracks")
-public class Track {
+@Document(collection = "albums")
+public class Album {
     @Id
     private String id;
 
-    @Field("title")
-    private String title;
+    @Field("name")
+    private String name;
 
     @Field("artist")
     private String artist;
 
-    @Field("album")
-    private String album;
-
     @Field("genre")
     private String genre;
 
-    @Field("duration")
-    private int duration;
+    @Field("tracks")
+    private List<Track> tracks;
 }

@@ -1,0 +1,8 @@
+com\example\library\Artist.class
+com\example\library\MusicLibraryService.class
+com\example\library\MusicLibrary.class
+com\example\library\MusicLibraryRepository.class
+com\example\library\Album.class
+com\example\library\MusicLibraryController.class
+com\example\library\LibraryApplication.class
+com\example\library\Track.class
