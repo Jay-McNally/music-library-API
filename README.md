@@ -6,8 +6,12 @@ This project is a Music Library API built with Spring Boot. It provides RESTful 
 
 - Retrieve all music libraries
 - Retrieve a music library by its ID
-- Save a new or updated music library
-- Delete a music library by its ID
+- Retrieve all artists
+- Retrieve artists by name
+- Retrieve all albums
+- Retrieve albums by artist or genre
+- Retrieve all tracks
+- Retrieve tracks by artist, album, or genre
 
 ## Technologies Used
 
@@ -32,7 +36,21 @@ docker-compose up
 
 ## Endpoints
 
-- `GET /api/music-library` - Retrieve all music libraries
-- `GET /api/music-library/{id}` - Retrieve a music library by its ID
-- `POST /api/music-library` - Save a new or updated music library
-- `DELETE /api/music-library/{id}` - Delete a music library by its ID
+### Music Libraries
+- `GET /api/music-libraries` - Retrieve all music libraries
+- `GET /api/music-libraries/{id}` - Retrieve a music library by its ID
+
+### Artists
+- `GET /api/artists` - Retrieve all artists
+- `GET /api/artists?name={name}` - Retrieve artists by name
+
+### Albums
+- `GET /api/albums` - Retrieve all albums
+- `GET /api/albums?artist={artist}` - Retrieve albums by artist
+- `GET /api/albums?genre={genre}` - Retrieve albums by genre
+
+### Tracks
+- `GET /api/tracks` - Retrieve all tracks
+- `GET /api/tracks?artist={artist}` - Retrieve tracks by artist
+- `GET /api/tracks?album={album}` - Retrieve tracks by album
+- `GET /api/tracks?genre={genre}` - Retrieve tracks by genre
