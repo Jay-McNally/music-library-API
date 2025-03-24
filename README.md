@@ -1,4 +1,4 @@
-# music-library-API
+# music-library-api
 
 This project is a Music Library API built with Spring Boot. It provides RESTful endpoints to manage music libraries, including artists, albums, and tracks. The application uses MongoDB as the database to store the music library data.
 
